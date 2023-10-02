@@ -1,9 +1,15 @@
 package Logica;
 import java.awt.EventQueue;
+import java.util.ArrayList;
 
+import Entidades.Caramelo;
 import Entidades.Entidad;
+import Entidades.Glaseado;
+import Entidades.Potenciador;
 import GUI.EntidadGrafica;
 import GUI.Ventana;
+import Objectives.CarameloTracker;
+import Objectives.ObjetivoDestruirEntidad;
 
 /**
  * Modela el comportamiento del Juego.
@@ -75,6 +81,7 @@ public class Juego {
             public void run() {
                 try {
                 	new Juego();
+					trackerTest();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -82,4 +89,19 @@ public class Juego {
         });
 	}
 
+	private static void trackerTest() {
+		CarameloTracker tracker = new CarameloTracker();
+		ObjetivoDestruirEntidad objetivoDestruirRojos = 
+		new ObjetivoDestruirEntidad(Caramelo.class, Color.ROJO, tracker, 5);
+
+		var lista = new ArrayList<Entidad>();
+		lista.add(new Caramelo(0, 0, Color.ROJO));
+		lista.add(new Caramelo(0, 0, Color.ROJO));
+		lista.add(new Caramelo(0, 0, Color.ROJO));
+		lista.add(new Glaseado(0, 0, Color.ROJO));
+		lista.add(new Potenciador(0, 0, Color.ROJO));
+
+		tracker.trackDestruction(lista);
+		tracker.trackDestruction(lista);
+	}
 }

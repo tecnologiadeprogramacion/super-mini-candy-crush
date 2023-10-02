@@ -11,12 +11,13 @@ public class Caramelo extends Entidad {
 		super(f, c, col, "/imagenes/caramelos/");
 	}
 	
+	// Implementación comportamiento para intercambiable
+	
 	public boolean es_posible_intercambiar(Entidad e) {
 		return e.puede_recibir(this);
 	}
 	
 	public boolean puede_recibir(Caramelo c) {
-		// To Do: programar la lógica para chequear match 3
 		return true;
 	}
 	
@@ -25,8 +26,28 @@ public class Caramelo extends Entidad {
 	}
 	
 	public boolean puede_recibir(Potenciador p) {
-		// To Do: programar la lógica para chequear match 3
 		return true;
+	}
+	
+	// Implementación comportamiento para matchable
+	
+	public boolean machea(Entidad e) {
+		return e.match_con(this);
+	}
+	
+	public boolean match_con(Potenciador p) {
+		// To DO: implementar la funcionalidad que chequea el match
+		return false;
+	}
+	
+	public boolean match_con(Glaseado g) {
+		// To DO: implementar la funcionalidad que chequea el match
+		return false;
+	}
+	
+	public boolean match_con(Caramelo c) {
+		// To DO: implementar la funcionalidad que chequea el match
+		return false;
 	}
 
 }

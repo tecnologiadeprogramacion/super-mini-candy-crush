@@ -11,24 +11,48 @@ public class Glaseado extends Entidad {
 		super(f, c, col, "/imagenes/glaseados/");
 	}
 	
-	public boolean enfocar() {
-		return false;
-	}
+	// Implementación comportamiento para intercambiable
 	
+	@Override
 	public boolean es_posible_intercambiar(Entidad e) {
 		return false;
 	}
 	
+	@Override
 	public boolean puede_recibir(Caramelo c) {
 		return false;
 	}
 	
+	@Override
 	public boolean puede_recibir(Glaseado g) {
 		return false;
 	}
 	
+	@Override
 	public boolean puede_recibir(Potenciador p) {
 		return false;
 	}
 	
+	// Implementación comportamiento para matchable
+	
+	@Override
+	public boolean machea(Entidad e) {
+		return false;
+	}
+	
+	@Override
+	public boolean match_con(Potenciador p) {
+		return false;
+	}
+	
+	@Override
+	public boolean match_con(Glaseado g) {
+		return false;
+	}
+	
+	@Override
+	public boolean match_con(Caramelo c) {
+		return false;
+	}
+
 }

@@ -16,11 +16,18 @@ import Logica.EntidadLogica;
 @SuppressWarnings("serial")
 public class Celda extends JLabel implements EntidadGrafica {
 	
-	protected Ventana mi_ventana;
+	protected VentanaAnimable mi_ventana;
 	protected EntidadLogica entidad_logica;
 	protected int size_label;
 	
-	public Celda(Ventana v, EntidadLogica e, int s) {
+	/**
+	 * Incicializa el estado interno de una celda, considerando
+	 * @param v La ventana a la que le solcitará animar cambios de estados o de posición, cuando la entidad lógica sí lo indique. 
+	 * @param e La entidad lógica que será representada con este elemento, y que notificará de cualquier cambio que requiera una actualización
+	 * desde la visión gráfica del mismo.
+	 * @param s El tamaño asociado a las JLabels que contienen las imágenes de todas las entidades lógicas de la aplicación.
+	 */
+	public Celda(VentanaAnimable v, EntidadLogica e, int s) {
 		super();
 		mi_ventana = v;
 		entidad_logica = e;
@@ -31,18 +38,34 @@ public class Celda extends JLabel implements EntidadGrafica {
 	
 	@Override
 	public void notificarse_cambio_estado() {
-		cambiar_imagen(entidad_logica.get_imagen_representativa());
+		mi_ventana.animar_cambio_estado(this);
 	}
 	
 	@Override
-	public void notificarse_intercambio_posicion(){
-		mi_ventana.considerar_para_intercambio_posicion(this);
+	public void notificarse_cambio_posicion(){
+		mi_ventana.animar_movimiento(this);
 	}
 	
+	/**
+	 * Obtiene la entidad lógica asociada a la entidad gráfica.
+	 * @return La entidad lógica asociada.
+	 */
 	public EntidadLogica get_entidad_logica() {
 		return entidad_logica;
 	}
 	
+	/**
+	 * Obtiene el tamaño asociado a la JLabel que representa la celda.
+	 * @return El tamaño asociado.
+	 */
+	public int get_size_label() {
+		return size_label;
+	}
+	
+	/**
+	 * Permite cambiar la imagen asociada a la celda, a partir de una ruta que especifica la ubicación de la nueva imagen.
+	 * @param i Ruta hacia la nueva imagen a establecer por sobre la celda.
+	 */
 	protected void cambiar_imagen(String i) {
 		ImageIcon imgIcon = new ImageIcon(this.getClass().getResource(i));
 		Image imgEscalada = imgIcon.getImage().getScaledInstance(size_label, size_label, Image.SCALE_SMOOTH);

@@ -9,35 +9,86 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import Animadores.CentralAnimaciones;
 import Logica.EntidadLogica;
 import Logica.Juego;
-import Threads.AnimadorIntercambio;
 
 /**
  * Modela el comportamiento de la Ventana de la aplicación.
  * Ofrece servicios para comunicar los diferentes elementos que conforman la gráfica de la aplicación con la lógica de la misma.
- * @author FJoaquin
+ * @author FJoaquin (federico.joaquin@cs.uns.edu.ar)
  *
  */
 @SuppressWarnings("serial")
-public class Ventana extends JFrame {
+public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificable{
 	
 	protected Juego mi_juego;
+	protected CentralAnimaciones mi_animador;
 	protected int filas;
 	protected int columnas;
 	
-	protected Celda celda_1_pendiente_animacion;
-	protected Celda celda_2_pendiente_animacion;
+	protected int animaciones_pendientes;
+	protected boolean bloquear_intercambios;
 	
 	protected JLabel texto_superior;
 	protected JPanel panel_principal;
 	private int size_label = 60;
 	
+	/**
+	 * Inicializa la ventana asociada al juego en progreso, considerando
+	 * @param j El juego que controlará la lógica de la aplicación, y con quien comunicará los movimientos del jugador.
+	 * @param f La cantidad de filas del tablero.
+	 * @param c La cantidad de columnas del tablero.
+	 */
 	public Ventana(Juego j, int f, int c) {
 		mi_juego = j;
+		mi_animador = new CentralAnimaciones(this);
+		
 		filas = f;
 		columnas = c;
+		
+		animaciones_pendientes = 0;
+		bloquear_intercambios = false;
+		
 		inicializar();
+	}
+	
+	/**
+	 * Crea una nueva celda, que quedará asociada a la entidad lógica parametrizada, a partir de la ubicación de esta.
+	 * Agrega y deja visible la celda creada, por sobre la pantalla.
+	 * @param e Entidad lógica con la que quedará asociada la celda.
+	 * @return La entidad gráfica creada.
+	 */
+	public EntidadGrafica agregar_entidad(EntidadLogica e) {
+		Celda celda = new Celda(this, e, size_label);
+		panel_principal.add(celda);
+		return celda;
+	}
+	
+	@Override
+	public void notificarse_animacion_en_progreso() {
+		synchronized(this){
+			animaciones_pendientes ++;
+			bloquear_intercambios = true;
+		}
+	}
+	
+	@Override
+	public void notificarse_animacion_finalizada() {
+		synchronized(this){
+			animaciones_pendientes --;
+			bloquear_intercambios = animaciones_pendientes > 0;
+		}
+	}
+	
+	@Override
+	public void animar_movimiento(Celda c) {
+		mi_animador.animar_cambio_posicion(c);
+	}
+	
+	@Override
+	public void animar_cambio_estado(Celda c) {
+		mi_animador.animar_cambio_estado(c);
 	}
 	
 	protected void inicializar() {
@@ -60,10 +111,10 @@ public class Ventana extends JFrame {
 					case KeyEvent.VK_RIGHT: { mi_juego.mover_jugador(Juego.DERECHA); break; }
 					case KeyEvent.VK_UP: 	{ mi_juego.mover_jugador(Juego.ARRIBA);break; }
 					case KeyEvent.VK_DOWN: 	{ mi_juego.mover_jugador(Juego.ABAJO); break; }
-					case KeyEvent.VK_W:		{ mi_juego.intercambiar(Juego.ARRIBA); break; }
-					case KeyEvent.VK_S:		{ mi_juego.intercambiar(Juego.ABAJO); break; }
-					case KeyEvent.VK_A:		{ mi_juego.intercambiar(Juego.IZQUIERDA); break; }
-					case KeyEvent.VK_D:		{ mi_juego.intercambiar(Juego.DERECHA); break; } 
+					case KeyEvent.VK_W:		{ if (!bloquear_intercambios) mi_juego.intercambiar(Juego.ARRIBA); break; }
+					case KeyEvent.VK_S:		{ if (!bloquear_intercambios) mi_juego.intercambiar(Juego.ABAJO); break; }
+					case KeyEvent.VK_A:		{ if (!bloquear_intercambios) mi_juego.intercambiar(Juego.IZQUIERDA); break; }
+					case KeyEvent.VK_D:		{ if (!bloquear_intercambios) mi_juego.intercambiar(Juego.DERECHA); break; } 
 				}
 			}
 		});
@@ -72,23 +123,5 @@ public class Ventana extends JFrame {
 		getContentPane().add(texto_superior, BorderLayout.NORTH);
 		
 		panel_principal.setFocusable(true);
-	}
-	
-	public EntidadGrafica agregar_entidad(EntidadLogica e) {
-		Celda celda = new Celda(this, e, size_label);
-		panel_principal.add(celda);
-		return celda;
-	}
-	
-	public void considerar_para_intercambio_posicion(Celda c) {
-		if (celda_1_pendiente_animacion == null) {
-			celda_1_pendiente_animacion = c;
-		}else {
-			celda_2_pendiente_animacion = c;
-			AnimadorIntercambio mi_animador_intercambio = new AnimadorIntercambio(size_label, 10, 50, celda_1_pendiente_animacion, celda_2_pendiente_animacion);
-			celda_1_pendiente_animacion = null;
-			celda_2_pendiente_animacion = null;
-			mi_animador_intercambio.start();
-		}
 	}
 }

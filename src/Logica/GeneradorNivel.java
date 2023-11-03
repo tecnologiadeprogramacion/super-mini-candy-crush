@@ -1,40 +1,45 @@
 package Logica;
 
-import Entidades.Caramelo;
-import Entidades.Glaseado;
-import Entidades.Potenciador;
+import java.util.Random;
 
-/**
- * Simula el comportamiento real de un Generador de Nivel, cableando la generación de entidades de forma manual.
- * Se espera que la clase permita parsear el contenido de un archivo de texto, desde donde se generará efectivamente el nivel.
- * En esta versión, se permiten:
- * - Caramelos de todos los colores.
- * - Glaseados de color negro.
- * @author FJoaquin (federico.joaquin@cs.uns.edu.ar)
- *
- */
+import Entidades.Caramelo;
+import Entidades.Color;
+import Entidades.Gelatina;
+import Entidades.Glaseado;
+import Entidades.PotenciadorHorizontal;
+import Entidades.PotenciadorVertical;
+
 public class GeneradorNivel {
 
-	public static Nivel cargar_nivel_y_tablero(int nivel, Tablero t) {
-		t.resetar_tablero(5, 5);
+	public static Nivel cargar_nivel_y_tablero(int nivel, TableroJuego tablero) {
+		Random random = new Random(System.currentTimeMillis());
+		Caramelo caramelo_random;
+		int color_random;
 		
-		for(int y=0; y<3; y++) {
-			t.agregar_entidad(new Caramelo(0,y, Color.AZUL));
-			t.agregar_entidad(new Glaseado(1,y, Color.NEGRO));
-			t.agregar_entidad(new Caramelo(2,y, Color.VERDE));
-			t.agregar_entidad(new Caramelo(3,y, Color.NARANJA));
-			t.agregar_entidad(new Caramelo(4,y, Color.VIOLETA));
+		tablero.resetar_tablero(6, 6);
+		
+		for(int y=0; y<4; y++) {
+			tablero.agregar_entidad(new Caramelo(tablero, 0, y, Color.AZUL));
+			tablero.agregar_entidad(new Glaseado(tablero, 1, y, Color.NEGRO));
+			tablero.agregar_entidad(new Caramelo(tablero, 2, y, Color.VERDE));
+			tablero.agregar_entidad(new Caramelo(tablero, 3, y, Color.NARANJA));
+			tablero.agregar_entidad(new PotenciadorHorizontal(tablero, 4, y, Color.VIOLETA));
+			
+			color_random = random.nextInt(3) + 1; // colores disponibles para caramelos 1-2-3
+			caramelo_random = new Caramelo(tablero, 5, y, color_random);
+			tablero.agregar_entidad_y_asociada(new Gelatina(tablero, caramelo_random, 5, y, Color.TRANSPARENTE));
 		}
 		
-		for(int y=3; y<5; y++) {
-			t.agregar_entidad(new Caramelo(0,y, Color.AZUL));
-			t.agregar_entidad(new Caramelo(1,y, Color.ROJO));
-			t.agregar_entidad(new Caramelo(2,y, Color.VERDE));
-			t.agregar_entidad(new Glaseado(3,y, Color.NEGRO));
-			t.agregar_entidad(new Caramelo(4,y, Color.VIOLETA));
+		for(int y=4; y<6; y++) {
+			tablero.agregar_entidad(new PotenciadorVertical(tablero, 0, y, Color.AZUL));
+			tablero.agregar_entidad(new Caramelo(tablero, 1, y, Color.ROJO));
+			tablero.agregar_entidad(new Caramelo(tablero, 2, y, Color.VERDE));
+			tablero.agregar_entidad(new Glaseado(tablero, 3, y, Color.NEGRO));
+			tablero.agregar_entidad(new Caramelo(tablero, 4, y, Color.VIOLETA));
+			tablero.agregar_entidad(new Caramelo(tablero, 5,y, Color.NARANJA));
 		}
 		
-		return new Nivel(2,2);
+		return new Nivel(3,2);
 	}
 	
 }

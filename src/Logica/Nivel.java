@@ -1,12 +1,5 @@
 package Logica;
 
-/**
- * Modela la clase nivel. Se espera que el mismo permita observar los objetivos esperados para el nivel.
- * También se espera que permita mantener cuenta de los objetivos cumplidos y no, y que permita que el juego pueda consultar si
- * los objetivos fueron cumplimentados, para transicionar de nivel.
- * @author FJoaquin (federico.joaquin@cs.uns.edu.ar)
- *
- */
 public class Nivel {
 	
 	protected int fila_inicial_jugador;

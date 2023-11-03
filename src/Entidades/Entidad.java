@@ -1,68 +1,53 @@
 package Entidades;
 
 import GUI.EntidadGrafica;
-import Logica.EntidadLogica;
+import Logica.TableroNotificable;
 
-/**
- * Generaliza el comportamiento estándar de todas las entidades que forman parte del tablero.
- * @author FJoaquin (federico.joaquin@cs.uns.edu.ar)
- *
- */
-public abstract class Entidad implements EntidadLogica, Enfocable, Intercambiable, Matchable, Detonable {
+public abstract class Entidad implements EntidadLogica, Enfocable, Intercambiable, Matchable, Detonable, Ocultable {
+	protected TableroNotificable tablero;
+	protected EntidadGrafica entidad_grafica;
+	
 	protected int fila;
 	protected int columna;
 	protected int color;
 	
 	protected boolean enfocada;
 	protected boolean detonada;
+	protected boolean visible;
 	
 	protected String [] imagenes_representativas;
-	protected EntidadGrafica entidad_grafica;
 	
-	/**
-	 * Inicializa el estado interno de una entidad, considerando
-	 * @param f La fila donde se ubica la entidad.
-	 * @param c La columna donde se ubica la entidad.
-	 * @param col El color asociado a la entidad. Se asume constante de la clase Color.
-	 * @param path_img Ruta donde se encuentran todas las imágenes asociadas a la entidad creada.
-	 */
-	protected Entidad(int f, int c, int col, String path_img) {
-		fila = f;
-		columna = c;
-		color = col;
-		enfocada = false;
-		detonada = false;
-		cargar_imagenes_representativas(path_img);
+	protected Entidad(TableroNotificable tablero, int fila, int columna, int color, String path_imagenes, boolean visible) {
+		this.tablero = tablero;
+		this.fila = fila;
+		this.columna = columna;
+		this.color = color;
+		this.enfocada = false;
+		this.detonada = false;
+		this.visible = visible;
+		cargar_imagenes_representativas(path_imagenes);
 	}
 	
-	/**
-	 * Vincula el elemento con su entidad gráfica asociada.
-	 * @param e Entidad gráfica que se encuentra asociada al elemento.
-	 */
-	public void set_entidad_grafica(EntidadGrafica e) {
-		entidad_grafica = e;
+	private void cargar_imagenes_representativas(String path_img) {
+		imagenes_representativas = new String [4];
+		imagenes_representativas[0] = path_img + color +".png";
+		imagenes_representativas[1] = path_img + color +"-enfocado.png";
+		imagenes_representativas[2] = path_img + color +"-detonado.gif";
+		imagenes_representativas[3] = path_img + color +"-enfocado-detonado.gif";
 	}
 	
-	/**
-	 * Retorna la fila donde se ubica la entidad.
-	 */
+	// Operaciones Entidad Logica (Entidad <-- Celda)
+	
 	public int get_fila() {
 		return fila;
 	}
 	
-	/**
-	 * Retorna la columna donde se ubica la entidad.
-	 */
 	public int get_columna() {
 		return columna;
 	}
 	
-	/**
-	 * Retorna el color asociado a la entidad.
-	 * @return Constante numérica que representa el color de la entidad. Se asume un valor declarado en clase Color.
-	 */
-	public int get_color() {
-		return color;
+	public boolean get_visibilidad() {
+		return visible;
 	}
 	
 	public String get_imagen_representativa() {
@@ -72,40 +57,83 @@ public abstract class Entidad implements EntidadLogica, Enfocable, Intercambiabl
 		return imagenes_representativas[indice];
 	}
 	
-	@Override
+	// Operaciones Enfocable (Entidad <-- Juego)
+	
 	public void enfocar() {
 		enfocada = true;
-		entidad_grafica.notificarse_cambio_estado();
+		entidad_grafica.notificarse_cambio_foco();
 	}
 	
-	@Override
 	public void desenfocar() {
 		enfocada = false;
-		entidad_grafica.notificarse_cambio_estado();
+		entidad_grafica.notificarse_cambio_foco();
 	}
 	
-	@Override
-	public void cambiar_posicion(int nf, int nc) {
-		fila = nf;
-		columna = nc;
-		entidad_grafica.notificarse_cambio_posicion();
-	}
+	// Operaciones Detonable (Entidad <-- Juego)
 	
-	@Override
 	public void detonar() {
 		detonada = true;
-		entidad_grafica.notificarse_cambio_estado();
+		entidad_grafica.notificarse_detonacion();
 	}
 	
-	/**
-	 * Inicializa el arreglo de paths que establecen las imágenes asociadas a los diferentes estados de la entidad.
-	 * @param path_img Ruta donde se encuentran todas las imágenes asociadas a la entidad creada.
-	 */
-	private void cargar_imagenes_representativas(String path_img) {
-		imagenes_representativas = new String [4];
-		imagenes_representativas[0] = path_img + color +".png";
-		imagenes_representativas[1] = path_img + color +"-enfocado.png";
-		imagenes_representativas[2] = path_img + color +"-detonado.png";
-		imagenes_representativas[3] = path_img + color +"-enfocado-detonado.png";
+	// Operaciones Ocultable (Entidad <-- Tablero)
+	
+	public void mostrar() {
+		visible = true;
+		entidad_grafica.notificarse_cambio_visibilidad();
+	}
+	
+	public void ocultar() {
+		visible = false;
+		entidad_grafica.notificarse_cambio_visibilidad();
+	}
+	
+	// Operaciones para cambio de posiciones
+	
+	public void cambiar_posicion(int nueva_fila, int nueva_columna) {
+		fila = nueva_fila;
+		columna = nueva_columna;
+		entidad_grafica.notificarse_intercambio();
+	}
+	
+	// TO DO: Completar con su correcta definición
+	// Hardcodeada para mostrar caida simple y sin ningun tipo de control.
+	public void caer() {
+		fila ++;
+		entidad_grafica.notificarse_caida();
+	}
+	
+	// Operaciones para comandos y consulta de atributos 
+	
+	public void set_entidad_grafica(EntidadGrafica e) {
+		entidad_grafica = e;
+	}
+	
+	public int get_color() {
+		return color;
+	}
+	
+	// Operaciones locales a Entidad
+	
+	protected void intercambiar_entidad_y_entidad(Entidad origen, Entidad destino) {
+		int nueva_fila_origen = destino.get_fila();
+		int nueva_columna_origen = destino.get_columna();
+		destino.cambiar_posicion(origen.get_fila(), origen.get_columna());
+		origen.cambiar_posicion(nueva_fila_origen, nueva_columna_origen);
+		tablero.reubicar(origen);
+		tablero.reubicar(destino);
+	}
+	
+	protected void intercambiar_caramelo_y_gelatina(Caramelo caramelo, Gelatina gelatina) {
+		Caramelo caramelo_interno_gelatina = gelatina.get_caramelo_interno();
+		int nueva_fila_caramelo = gelatina.get_fila();
+		int nueva_columna_caramelo = gelatina.get_columna();
+		int nueva_fila_caramelo_interno = caramelo.get_fila();
+		int nueva_columna_caramelo_interno = caramelo.get_columna();
+		
+		caramelo_interno_gelatina.cambiar_posicion(nueva_fila_caramelo_interno, nueva_columna_caramelo_interno);
+		caramelo.cambiar_posicion(nueva_fila_caramelo, nueva_columna_caramelo);
+		gelatina.set_caramelo_interno(caramelo);
+		tablero.reubicar(caramelo_interno_gelatina);
 	}
 }

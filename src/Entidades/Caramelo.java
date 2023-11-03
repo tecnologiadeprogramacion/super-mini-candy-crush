@@ -1,53 +1,74 @@
 package Entidades;
 
-/**
- * Modela el comportamiento de los Caramelos.
- * @author FJoaquin (federico.joaquin@cs.uns.edu.ar)
- *
- */
+import Logica.TableroNotificable;
+
 public class Caramelo extends Entidad {
 	
-	public Caramelo(int f, int c, int col) {
-		super(f, c, col, "/imagenes/caramelos/");
+	public Caramelo(TableroNotificable tablero, int fila, int columna, int color) {
+		super(tablero, fila, columna, color, "/imagenes/caramelo/", true);
 	}
 	
-	// Implementación comportamiento para intercambiable
-	
-	public boolean es_posible_intercambiar(Entidad e) {
-		return e.puede_recibir(this);
+	public Caramelo(TableroNotificable tablero, int fila, int columna, int color, boolean visible) {
+		super(tablero, fila, columna, color, "/imagenes/caramelo/", visible);
 	}
 	
-	public boolean puede_recibir(Caramelo c) {
+	public boolean es_posible_intercambiar(Entidad entidad) {
+		return entidad.puede_recibir(this);
+	}
+	
+	public boolean puede_recibir(Caramelo caramelo) {
 		return true;
 	}
-	
-	public boolean puede_recibir(Glaseado g) {
-		return false;
-	}
-	
-	public boolean puede_recibir(Potenciador p) {
-		return true;
-	}
-	
-	// Implementación comportamiento para matchable
-	
-	public boolean machea(Entidad e) {
-		return e.match_con(this);
-	}
-	
-	public boolean match_con(Potenciador p) {
-		// To DO: implementar la funcionalidad que chequea el match
-		return false;
-	}
-	
-	public boolean match_con(Glaseado g) {
-		// To DO: implementar la funcionalidad que chequea el match
-		return false;
-	}
-	
-	public boolean match_con(Caramelo c) {
-		// To DO: implementar la funcionalidad que chequea el match
+
+	public boolean puede_recibir(Glaseado glaseado) {
 		return false;
 	}
 
+	public boolean puede_recibir(Potenciador potenciador) {
+		return true;
+	}
+
+	public boolean puede_recibir(Gelatina gelatina) {
+		return gelatina.get_caramelo_interno().puede_recibir(this);
+	}
+	
+	public void intercambiar(Entidad entidad) {
+		entidad.intercambiar_con(this);
+	}
+	
+	public void intercambiar_con(Caramelo caramelo) {
+		intercambiar_entidad_y_entidad(this, caramelo);
+	}
+
+	public void intercambiar_con(Potenciador potenciador) {
+		intercambiar_entidad_y_entidad(this, potenciador);
+	}
+	
+	public void intercambiar_con(Glaseado glaseado) {
+		
+	}
+
+	public void intercambiar_con(Gelatina gelatina) {
+		intercambiar_caramelo_y_gelatina(this, gelatina);
+	}
+	
+	public boolean se_produce_match_con(Entidad e) {
+		return e.aplica_match_con(this);
+	}
+	
+	public boolean aplica_match_con(Caramelo c) {
+		return false;
+	}
+	
+	public boolean aplica_match_con(Potenciador p) {
+		return false;
+	}
+	
+	public boolean aplica_match_con(Glaseado g) {
+		return false;
+	}
+	
+	public boolean aplica_match_con(Gelatina g) {
+		return false;
+	}
 }
